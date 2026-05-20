@@ -1,0 +1,38 @@
+services:
+  mongodb:
+    image: mongo:4.2.0
+    container_name: sample-mongodb
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - backend-db-network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: sample-backend
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+    depends_on:
+      - mongodb
+    networks:
+      - backend-db-network
+      - frontend-backend-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: sample-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - frontend-backend-network
+
+volumes:
+  mongodb-data:
+
+networks:
+  backend-db-network:
+  frontend-backend-network:
